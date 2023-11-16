@@ -131,9 +131,9 @@ def ImgGRAYtoOutlineSelection(event):
                 up = GrayImgPixels[y+1][x]
             if x < WIDTH_IMG-1:
                 right = GrayImgPixels[y][x+1]
-            dx = abs(right - current)
-            dy = abs(up-current)
-            gradient = int(math.sqrt(dx**2 + dy**2))*20
+            dx = (right - current)
+            dy = (up-current)
+            gradient = int(math.sqrt(dx**2 + dy**2))
             GradientImg[y][x] = gradient
             cnv.create_rectangle(x, j, x+1, j+1, fill=translationGrayIntToHex(gradient), outline=translationGrayIntToHex(gradient), tag="gradient-color")
 
@@ -143,7 +143,7 @@ def ImgGRADIENTtoBLACKiWHITE():
         for x in range(WIDTH_IMG):
             i = x + CNV_X_4
             j = y + CNV_Y_4
-            gradient = GrayImgPixels[y][x]
+            gradient = GradientImg[y][x]
             color = 0
             if gradient > gradient_:
                 color=255
@@ -158,6 +158,15 @@ A = 0
 B = 1
 def IncreaseContrast_function(event):
     cnv.delete('ContrastBW-color')
+
+    global GrayImgPixels
+    g = [0 for i in range(WIDTH_IMG+2)]
+    GrayImgPixels.insert(0, g)
+    for y in range(1, HEIGHT_IMG):
+        GrayImgPixels[y].insert(0, 0)
+        GrayImgPixels[y].append(0)
+    GrayImgPixels.append(g)
+    print(GrayImgPixels)
     for y in range(1, HEIGHT_IMG-1):
         for x in range(1, WIDTH_IMG-1):
             i = x + CNV_X_4 + WIDTH_IMG+10
