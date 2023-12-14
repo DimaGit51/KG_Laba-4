@@ -68,11 +68,12 @@ def display():
     entry.delete(0, END)
     ImgGRADIENTtoBLACKiWHITE()
 
-cnv.create_rectangle(CNV_X_3, CNV_Y_3+HEIGHT_IMG+10, CNV_X_4+WIDTH_IMG, SCREEN_Y, outline="#004D40")
+cnv.create_rectangle(880, 450, 1200, 450, outline="#004D40")
+cnv.create_rectangle(880, 450, 880, 600, outline="#004D40")
 entry = ttk.Entry()
-entry.place(x=CNV_X_4, y=CNV_Y_3+HEIGHT_IMG+15)
+entry.place(x=900, y=522)
 btn = ttk.Button(text="Обработать!", command=display)
-btn.place(x=CNV_X_4, y=CNV_Y_3+HEIGHT_IMG+40)
+btn.place(x=1035, y=520)
 
 def translationRGB(a, b ,c):
     return '#%02x%02x%02x' % (a, b, c)
@@ -103,11 +104,13 @@ def translationGRAY(r, g ,b):
 def translationGrayIntToHex(n):
     return '#%02x%02x%02x' % (n, n, n)
 
-def ImgRGBtoGRAY_function(event):
+def ImgRGBtoGRAY_function():
     cnv.delete("gray-picture")
     global GrayImgPixels
     GrayImgPixels = [[0] * WIDTH_IMG for i in range(HEIGHT_IMG)]
     for y in range(HEIGHT_IMG):
+        if y%10 == 0:
+            root.update()
         for x in range(WIDTH_IMG):
             r, g, b = img_1.get(x, y)
             i = x + CNV_X_2
@@ -116,11 +119,13 @@ def ImgRGBtoGRAY_function(event):
             GrayImgPixels[y][x] = gray
             cnv.create_rectangle(i, j, i+1, j+1, fill=translationGrayIntToHex(gray), outline=translationGrayIntToHex(gray), tag="gray-picture")
 
-def ImgGRAYtoOutlineSelection(event):
+def ImgGRAYtoOutlineSelection():
     cnv.delete("gradient-picture")
     global GradientImg
     GradientImg = [[0] * WIDTH_IMG for i in range(HEIGHT_IMG)]
     for y in range(HEIGHT_IMG):
+        if y % 10 == 0:
+            root.update()
         for x in range(WIDTH_IMG):
             i = x + CNV_X_3
             j = y + CNV_Y_3
@@ -140,6 +145,8 @@ def ImgGRAYtoOutlineSelection(event):
 def ImgGRADIENTtoBLACKiWHITE():
     cnv.delete("gradientBW-picture")
     for y in range(HEIGHT_IMG):
+        if y % 10 == 0:
+            root.update()
         for x in range(WIDTH_IMG):
             i = x + CNV_X_4
             j = y + CNV_Y_4
@@ -151,12 +158,15 @@ def ImgGRADIENTtoBLACKiWHITE():
                 color = 0
             cnv.create_rectangle(i, j, i+1, j+1, fill=translationGrayIntToHex(color), outline=translationGrayIntToHex(color), tag="gradientBW-color")
 
+# IncreaseContrast = [[0, -1, 0],
+#                     [-1, 4, -1],
+#                     [0, -1, 0]]
 IncreaseContrast = [[-1, -1, -1],
                     [-1, 9, -1],
                     [-1, -1, -1]]
 A = 0
 B = 1
-def IncreaseContrast_function(event):
+def IncreaseContrast_function():
     cnv.delete('ContrastBW-color')
 
     global GrayImgPixels
@@ -168,6 +178,8 @@ def IncreaseContrast_function(event):
     GrayImgPixels.append(g)
     print(GrayImgPixels)
     for y in range(1, HEIGHT_IMG-1):
+        if y % 10 == 0:
+            root.update()
         for x in range(1, WIDTH_IMG-1):
             i = x + CNV_X_4 + WIDTH_IMG+10
             j = y
@@ -182,10 +194,19 @@ def IncreaseContrast_function(event):
             (IncreaseContrast[2][2]*GrayImgPixels[y + 1][x + 1]))
             if C<0:
                 C = 0
+            elif C > 255:
+                C = 255
             cnv.create_rectangle(i, j, i+1, j+1, fill=translationGrayIntToHex(C), outline=translationGrayIntToHex(C), tag="ContrastBW-color")
             root.bind("<B1-Motion>", Сursor)
 
-root.bind("<B2-Motion>", ImgGRAYtoOutlineSelection)
+btn_gray = ttk.Button(text="Перевод в черное-белое изображение", command=ImgRGBtoGRAY_function)
+btn_gray.place(x=900, y=460)
+
+btn_ImgGRAYtoOutlineSelection = ttk.Button(text="Градиентный метод func1", command=ImgGRAYtoOutlineSelection)
+btn_ImgGRAYtoOutlineSelection.place(x=900, y=490)
+
+btn_ImgGRAYtoOutlineSelection = ttk.Button(text="Контрастирование", command=IncreaseContrast_function)
+btn_ImgGRAYtoOutlineSelection.place(x=900, y=550)
+
 root.bind("<B3-Motion>", IncreaseContrast_function)
-root.bind("<Left>", ImgRGBtoGRAY_function)
 root.mainloop()
